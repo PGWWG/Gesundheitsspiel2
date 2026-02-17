@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gesundheitssystem-Spiel - S2 Wilhelm Gymnasium</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #bbdefb);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            background: linear-gradient(to right, #0d47a1, #1976d2);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        main {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        section {
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #0d47a1;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #1976d2;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #0d47a1;
+            margin: 20px 0 15px 0;
+        }
+
+        button {
+            background: linear-gradient(to right, #0d47a1, #1976d2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        #intro button {
+            background: linear-gradient(to right, #4caf50, #8bc34a);
+            font-size: 1.2rem;
+            padding: 15px 30px;
+        }
+
+        #intro button:hover {
+            background: linear-gradient(to right, #388e3c, #7cb342);
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            flex: 1;
+            min-width: 200px;
+            margin: 10px;
+            text-align: center;
+        }
+
+        .stat span {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        progress {
+            width: 100%;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+
+        #money-bar {
+            accent-color: #f44336;
+        }
+
+        #quality-bar {
+            accent-color: #4caf50;
+        }
+
+        #access-bar {
+            accent-color: #2196f3;
+        }
+
+        .choices {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .choices button {
+            text-align: left;
+            padding: 15px;
+            background: linear-gradient(to right, #e3f2fd, #bbdefb);
+            border-left: 4px solid #1976d2;
+            transition: all 0.3s ease;
+        }
+
+        .choices button:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        #result {
+            background: #e8f5e9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #4caf50;
+        }
+
+        footer {
+            text-align: center;
+            background: #333;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .game-stats {
+                flex-direction: column;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Das deutsche Gesundheitssystem</h1>
+            <p>Eine interaktive Lernumgebung für S2 Wilhelm Gymnasium</p>
+        </header>
+        
+        <main>
+            <section id="intro">
+                <h2>Willkommen zum Gesundheitsspiel!</h2>
+                <p>Du bist ein Politiker im deutschen Gesundheitssystem. Deine Aufgabe: Entscheide, wie die Ressourcen verteilt werden sollen.</p>
+                <p>In diesem Spiel wirst du verschiedene Herausforderungen erleben, die das deutsche Gesundheitssystem heute bewältigen muss.</p>
+                <button onclick="startGame()">Spiel starten</button>
+            </section>
+            
+            <section id="game" style="display: none;">
+                <h2>Deine Entscheidungen</h2>
+                <div class="game-stats">
+                    <div class="stat">
+                        <span>Geld:</span>
+                        <progress id="money-bar" value="100" max="100"></progress>
+                        <span id="money-value">100%</span>
+                    </div>
+                    <div class="stat">
+                        <span>Qualität:</span>
+                        <progress id="quality-bar" value="80" max="100"></progress>
+                        <span id="quality-value">80%</span>
+                    </div>
+                    <div class="stat">
+                        <span>Zugänglichkeit:</span>
+                        <progress id="access-bar" value="70" max="100"></progress>
+                        <span id="access-value">70%</span>
+                    </div>
+                </div>
+                
+                <div id="scenario">
+                    <h3>Neues Szenario</h3>
+                    <p id="scenario-text">Ein neuer medizinischer Fortschritt wird entwickelt, der die Behandlung von Krebs verbessern könnte. Allerdings ist er sehr teuer.</p>
+                    <div class="choices">
+                        <button onclick="makeChoice(0)">1. Investiere in den Fortschritt - Risiko: Qualität sinkt</button>
+                        <button onclick="makeChoice(1)">2. Investiere nicht - Risiko: Zugänglichkeit sinkt</button>
+                        <button onclick="makeChoice(2)">3. Finde einen Kompromiss - Risiko: Geld wird reduziert</button>
+                    </div>
+                </div>
+                
+                <div id="result" style="display: none;">
+                    <h3>Ergebnis</h3>
+                    <p id="result-text">Deine Entscheidung hat Auswirkungen auf das Gesundheitssystem...</p>
+                    <button onclick="nextScenario()">Weiter zum nächsten Szenario</button>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <p>Erstellt für S2 Wilhelm Gymnasium | Das deutsche Gesundheitssystem</p>
+        </footer>
+    </div>
+    
+    <script>
+        let gameStarted = false;
+        let currentScenario = 0;
+        let stats = {
+            money: 100,
+            quality: 80,
+            access: 70
+        };
+
+        const scenarios = [
+            {
+                text: "Ein neuer medizinischer Fortschritt wird entwickelt, der die Behandlung von Krebs verbessern könnte. Allerdings ist er sehr teuer.",
+                choices: [
+                    { text: "Investiere in den Fortschritt - Risiko: Qualität sinkt", effect: { money: -10, quality: -15, access: 5 } },
+                    { text: "Investiere nicht - Risiko: Zugänglichkeit sinkt", effect: { money: 5, quality: 10, access: -20 } },
+                    { text: "Finde einen Kompromiss - Risiko: Geld wird reduziert", effect: { money: -20, quality: 5, access: 5 } }
+                ]
+            },
+            {
+                text: "Die Bevölkerung altert stark. Es fehlen Fachärzte für die Behandlung von altersbedingten Erkrankungen.",
+                choices: [
+                    { text: "Erhöhe die Ausbildung von Fachärzten - Risiko: Geld wird reduziert", effect: { money: -25, quality: 15, access: 10 } },
+                    { text: "Fördere Telemedizin - Risiko: Qualität sinkt", effect: { money: 5, quality: -10, access: 20 } },
+                    { text: "Erhöhe die Bezahlung für Ärzte - Risiko: Geld wird reduziert", effect: { money: -30, quality: 5, access: 15 } }
+                ]
+            },
+            {
+                text: "Es gibt eine Epidemie von Grippe. Das Gesundheitssystem ist überlastet.",
+                choices: [
+                    { text: "Stellen Sie mehr medizinisches Personal ein - Risiko: Geld wird reduziert", effect: { money: -30, quality: 10, access: 15 } },
+                    { text: "Fördern Sie Impfungen - Risiko: Qualität sinkt", effect: { money: 5, quality: -20, access: 25 } },
+                    { text: "Erhöhen Sie die Ressourcen für Notfälle - Risiko: Geld wird reduziert", effect: { money: -25, quality: 5, access: 10 } }
+                ]
+            }
+        ];
+
+        function startGame() {
+            gameStarted = true;
+            document.getElementById('intro').style.display = 'none';
+            document.getElementById('game').style.display = 'block';
+            nextScenario();
+        }
+
+        function makeChoice(choiceIndex) {
+            const scenario = scenarios[currentScenario];
+            const choice = scenario.choices[choiceIndex];
+            
+            // Anwenden der Effekte
+            stats.money = Math.max(0, Math.min(100, stats.money + choice.effect.money));
+            stats.quality = Math.max(0, Math.min(100, stats.quality + choice.effect.quality));
+            stats.access = Math.max(0, Math.min(100, stats.access + choice.effect.access));
+            
+            // Aktualisieren der Anzeige
+            updateStats();
+            
+            // Ergebnis anzeigen
+            document.getElementById('scenario').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('result-text').textContent = "Deine Entscheidung hat Auswirkungen auf das Gesundheitssystem. Du hast " + choice.text + ".";
+        }
+
+        function nextScenario() {
+            if (currentScenario < scenarios.length - 1) {
+                currentScenario++;
+                const scenario = scenarios[currentScenario];
+                document.getElementById('scenario-text').textContent = scenario.text;
+                document.getElementById('result').style.display = 'none';
+                document.getElementById('scenario').style.display = 'block';
+            } else {
+                // Spiel beendet
+                document.getElementById('scenario').style.display = 'none';
+                document.getElementById('result').style.display = 'block';
+                document.getElementById('result-text').textContent = "Das Spiel ist beendet. Du hast folgende Werte erreicht: Geld: " + stats.money + "%, Qualität: " + stats.quality + "%, Zugänglichkeit: " + stats.access + "%.";
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('money-bar').value = stats.money;
+            document.getElementById('money-value').textContent = stats.money + '%';
+            document.getElementById('quality-bar').value = stats.quality;
+            document.getElementById('quality-value').textContent = stats.quality + '%';
+            document.getElementById('access-bar').value = stats.access;
+            document.getElementById('access-value').textContent = stats.access + '%';
+        }
+    </script>
+</body>
+</html>
