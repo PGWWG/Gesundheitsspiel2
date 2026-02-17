@@ -1,0 +1,1909 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gesundheitspolitik Verwaltung</title>
+    <style>
+        :root {
+            --primary: #2d7d8e;
+            --accent: #e67e22;
+            --danger: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --border: #bdc3c7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--dark);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, #1a4d54 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .phase-badge {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .metric-card {
+            background: #f8f9fa;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .metric-card.pulse {
+            animation: pulse 0.6s ease;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); box-shadow: 0 5px 20px rgba(0,0,0,0.15); }
+            100% { transform: scale(1); }
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .metric-label {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .metric-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary);
+            transition: color 0.3s ease;
+        }
+
+        .metric-value.critical { color: var(--danger); }
+        .metric-value.warning { color: var(--warning); }
+        .metric-value.good { color: var(--success); }
+
+        .metric-delta {
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .metric-delta.show { opacity: 1; }
+        .metric-delta.positive { color: var(--success); }
+        .metric-delta.negative { color: var(--danger); }
+
+        .progress-bar {
+            width: 100%;
+            height: 25px;
+            background: #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--primary));
+            border-radius: 12px;
+            transition: width 0.5s ease, background 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8em;
+            font-weight: bold;
+            min-width: 0;
+        }
+
+        .progress-fill.critical {
+            background: linear-gradient(90deg, var(--danger), #c0392b);
+        }
+
+        .progress-fill.warning {
+            background: linear-gradient(90deg, var(--warning), var(--accent));
+        }
+
+        .stakeholder-list {
+            font-size: 0.9em;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+        }
+
+        .stakeholder-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            margin: 5px 0;
+        }
+
+        .stakeholder-satisfaction {
+            display: inline-block;
+            width: 80px;
+            height: 15px;
+            background: #e0e0e0;
+            border-radius: 7px;
+            overflow: hidden;
+        }
+
+        .stakeholder-satisfaction-fill {
+            height: 100%;
+            background: var(--success);
+            transition: width 0.3s ease, background 0.3s ease;
+        }
+
+        .controls {
+            padding: 30px;
+            background: #f8f9fa;
+            border-top: 2px solid var(--border);
+        }
+
+        .day-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .day-info strong {
+            color: var(--accent);
+            font-size: 1.2em;
+        }
+
+        .day-progress {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .day-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), var(--accent), var(--danger));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .action-btn {
+            padding: 15px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            background: white;
+            border: 2px solid var(--border);
+            color: var(--dark);
+        }
+
+        .action-btn:hover:not(:disabled) {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .action-btn.primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .action-btn.danger {
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .action-btn.danger:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .dialog {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-height: 600px;
+            overflow-y: auto;
+            border: 2px solid var(--border);
+            box-shadow: none;
+        }
+
+        .dialog h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+        }
+
+        .dialog-text {
+            margin-bottom: 20px;
+            line-height: 1.8;
+            color: var(--dark);
+        }
+
+        .dialog-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-btn {
+            padding: 12px 15px;
+            background: var(--light);
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            font-size: 0.95em;
+        }
+
+        .option-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .option-btn:hover .option-description {
+            color: rgba(255,255,255,0.85);
+        }
+
+        .option-btn strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.05em;
+        }
+
+        .option-description {
+            font-size: 0.85em;
+            opacity: 0.8;
+            transition: color 0.2s ease;
+        }
+
+        .option-btn.back-btn {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: white;
+        }
+
+        .option-btn.back-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .info-box {
+            background: #e8f4f8;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+            font-size: 0.95em;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid var(--warning);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        .danger-box {
+            background: #fde8e8;
+            border-left: 4px solid var(--danger);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        .success-box {
+            background: #e8f8e8;
+            border-left: 4px solid var(--success);
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            padding: 15px 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 2000;
+            transform: translateX(120%);
+            transition: transform 0.4s ease;
+            max-width: 350px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.event { border-left-color: var(--warning); }
+        .notification.crisis { border-left-color: var(--danger); }
+        .notification.success { border-left-color: var(--success); }
+
+        .notification-title {
+            font-weight: 700;
+            margin-bottom: 5px;
+            font-size: 1em;
+        }
+
+        .notification-text {
+            font-size: 0.9em;
+            color: #555;
+        }
+
+        .game-over-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .game-over-overlay.active {
+            display: flex;
+        }
+
+        .game-over-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 650px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px) scale(0.95); opacity: 0; }
+            to { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .game-over-card h2 {
+            font-size: 2em;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .game-over-card .result-text {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 25px;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .final-scores {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .final-score-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .final-score-item:last-child {
+            border-bottom: none;
+        }
+
+        .score-bar-mini {
+            width: 120px;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-left: 10px;
+        }
+
+        .score-bar-mini-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 1s ease;
+        }
+
+        .decisions-log {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .decisions-log h3 {
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .decision-item {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9em;
+        }
+
+        .restart-btn {
+            display: block;
+            width: 100%;
+            padding: 15px 30px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .restart-btn:hover {
+            background: #1a4d54;
+            transform: scale(1.02);
+        }
+
+        .grade-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 1.3em;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .grade-S { background: linear-gradient(135deg, #f1c40f, #e67e22); }
+        .grade-A { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+        .grade-B { background: linear-gradient(135deg, #2d7d8e, #3498db); }
+        .grade-C { background: linear-gradient(135deg, #e67e22, #d35400); }
+        .grade-D { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+
+        .impact-preview {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 5px;
+        }
+
+        .impact-tag {
+            font-size: 0.75em;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .impact-tag.positive { background: #e8f8e8; color: var(--success); }
+        .impact-tag.negative { background: #fde8e8; color: var(--danger); }
+        .impact-tag.neutral { background: #f0f0f0; color: #666; }
+    </style>
+<script type='text/javascript' src='https://private-us-east-1.manuscdn.com/iIxPNqWbpKdFlocYxMJgJqm5SsIOMK5TwizNiL0ZOuXNEGA07U28W_tkgVwUj5AlTik1VP_RZGb5kxO3meTVpefGh3qP8yoJm2nh2n2_SSihhXHEcIIpPG7QWWyYADdwu7Bi2vweUujdz0lIsYYMU6qq4BnqR5uzHUQ_goeVaI89w68HXqK1UvvM6yxRelPvT7xmMNfbJ3J_9YpmeWGPyj1G-p6_R4flqZqsUemGNcU_iu6DBQWT7xLruZyjoXRMJcw7VpizPGl6mHHPamobB8Xqr3-MT-B2gzpJsZZ34TRwf2ekD9xnS-eyK1SeNu0DVzyEU9NIXBZW23d6zawXtQGjm0Sk6JWiMjSlVUc0Ofv4bt574235967HAyVT2Gt-HYZTEv8uBecKtWf6zDM-Z6eA2xBWEZTjVmegvWThRCGFOcG-gzLBnI6KKiZ6i5yeEKYs74OV8ycNddSYm0VmPrco4I4VG1gC6zNTwGKFO3y_p84t5r1Ha3RtevuTZ-EZmmO1LGMZHnqH_VHCFTIYat5VBNv0CZtbrgcdyoAJczLW9WT8LXkNWqn0uBGXYsbrr3pWIUTqzChXbKX0w9EpH-AGr8CxgIuXPHep4adBouKEJCPZOmEll6BlZPWEeprei1lbOLBNpuZCWX27FrWIGNmekDYg4rdUhyPMr5kBCYBTbNHX8s24F94QFxBQlnISOJuFs6SAcl9XYiJiJhIP2aPYlJrfwWhy8hN7NjavfWVzbIKh9FuFTirOrLi92RFap8U84-eUyX9VEgOhBYAMRkN3-YOGAi-E5j3froVHSScn0euLjh1q4ZzHYUFnVeCN5I1lU5UoZOzGckpB4rIatJn8yCRrw9btiBZNFMrgFIguwbzsqom-eKpmxkzziq_NtUwxiE8aQ_k_-fuhUUCtkigFx7LHPEbqUBLn932UoT2rrMDGY0BJJ_oOwzJYO4iSS1K3QzdbDB7HHpj6h-ctJHpwCAWZbWzXIHGTZ_nIllT0iUEBHpy1YL005euRyZSnTR4tzBa6B96It0Vqs4Ljilvc2yFmhknLRHjm-NiDop_0-oAb_nzVem2w-HaePsnpAS3ZFwREccgNtsiTlVGzWxSb6qIbK8FzepIfdZSCiuvqnlaRHplDKOMigUUHDnblNbVP_1uUYKmk7L_WhEFiHCiO5IMtXysOs17f0MOC7287l8EmyJf5g7BVzEwh7OG8uQgWvrpJFRfYkntQ2dJaV4o7Svf_xoV9AyzD4dpDcYUe9i9Jp_jmiKhmTQh6yeuzbLf4pnrR-dfTAH9CzhdbLX6ksOp1apexbl-AkDACL_HLZwb7PaGW4-zlk1nUKMOXjr_UtgEwwKXQaUtjiTl3gaefwBlgnECoH6yLOLZ2fUcRxU8OHmkHLtjLOb543B1Ny4jL94lH4hs3NqxGzKtHeiNyEnCLWUUOM_c7QsyybcqB53eAMP8JFUMVs3QcnGLQaCi6Bc3bSdLQ5R9JUniJXbLNykbjYaZF6TyLtHuayQT3ldp-T9L4t8IrB6nNyFkKxPvcgeRfdo6SuXumB4L0i2WMFa6H93kLfOihgD6AYIffrQ'></script></head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Gesundheitspolitik Verwaltung</h1>
+            <p>Simuliere 90 Tage als Bundesgesundheitsminister:in</p>
+            <div class="phase-badge" id="phaseBadge">Phase 1: Orientierung</div>
+        </div>
+
+        <div class="main-content">
+            <div class="dashboard">
+                <div class="metric-card" id="budgetCard">
+                    <div class="metric-header">
+                        <span class="metric-label">Budget-Gesundheit</span>
+                        <span>
+                            <span class="metric-value" id="budgetValue">30%</span>
+                            <span class="metric-delta" id="budgetDelta"></span>
+                        </span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill critical" id="budgetBar" style="width: 30%"></div>
+                    </div>
+                </div>
+
+                <div class="metric-card" id="satisfactionCard">
+                    <div class="metric-header">
+                        <span class="metric-label">Stakeholder-Zufriedenheit</span>
+                        <span>
+                            <span class="metric-value" id="satisfactionValue">21%</span>
+                            <span class="metric-delta" id="satisfactionDelta"></span>
+                        </span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill critical" id="satisfactionBar" style="width: 21%"></div>
+                    </div>
+                    <div class="stakeholder-list">
+                        <div class="stakeholder-item">
+                            <span>AOK</span>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <div class="stakeholder-satisfaction"><div class="stakeholder-satisfaction-fill" style="width: 40%"></div></div>
+                                <span style="min-width:35px;text-align:right;">40%</span>
+                            </div>
+                        </div>
+                        <div class="stakeholder-item">
+                            <span>Ärzte</span>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <div class="stakeholder-satisfaction"><div class="stakeholder-satisfaction-fill" style="width: 15%"></div></div>
+                                <span style="min-width:35px;text-align:right;">15%</span>
+                            </div>
+                        </div>
+                        <div class="stakeholder-item">
+                            <span>Grüne</span>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <div class="stakeholder-satisfaction"><div class="stakeholder-satisfaction-fill" style="width: 25%"></div></div>
+                                <span style="min-width:35px;text-align:right;">25%</span>
+                            </div>
+                        </div>
+                        <div class="stakeholder-item">
+                            <span>Patienten</span>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <div class="stakeholder-satisfaction"><div class="stakeholder-satisfaction-fill" style="width: 10%"></div></div>
+                                <span style="min-width:35px;text-align:right;">10%</span>
+                            </div>
+                        </div>
+                        <div class="stakeholder-item">
+                            <span>Arbeitgeber</span>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <div class="stakeholder-satisfaction"><div class="stakeholder-satisfaction-fill" style="width: 15%"></div></div>
+                                <span style="min-width:35px;text-align:right;">15%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="metric-card" id="qualityCard">
+                    <div class="metric-header">
+                        <span class="metric-label">Versorgungsqualität</span>
+                        <span>
+                            <span class="metric-value" id="qualityValue">50%</span>
+                            <span class="metric-delta" id="qualityDelta"></span>
+                        </span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill warning" id="qualityBar" style="width: 50%"></div>
+                    </div>
+                </div>
+
+                <div class="metric-card" id="justiceCard">
+                    <div class="metric-header">
+                        <span class="metric-label">Gerechtigkeit</span>
+                        <span>
+                            <span class="metric-value" id="justiceValue">30%</span>
+                            <span class="metric-delta" id="justiceDelta"></span>
+                        </span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill critical" id="justiceBar" style="width: 30%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dialog" id="mainDialog">
+                <h2 id="dialogTitle">Willkommen, Minister:in!</h2>
+                <div id="dialogContent" class="dialog-text"></div>
+                <div class="dialog-options" id="dialogOptions"></div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="day-info">
+                <strong id="dayDisplay">Tag 1 von 90</strong>
+                <br>
+                <span id="phaseDisplay">Orientierungsphase</span>
+                <div class="day-progress">
+                    <div class="day-progress-fill" id="dayProgressFill" style="width: 1.1%"></div>
+                </div>
+            </div>
+
+            <div class="action-grid" id="actionGrid">
+                <button class="action-btn primary" onclick="game.showDecisionMenu()" id="btnNegotiate">
+                    Verhandlungen starten
+                </button>
+                <button class="action-btn primary" onclick="game.showPolicyMenu()" id="btnPolicy">
+                    Reform entwerfen
+                </button>
+                <button class="action-btn" onclick="game.skipDays()" id="btnSkip">
+                    Tage überspringen (+5)
+                </button>
+                <button class="action-btn" onclick="game.showBudgetInfo()" id="btnBudget">
+                    Budget-Details
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        <div class="notification-title" id="notifTitle"></div>
+        <div class="notification-text" id="notifText"></div>
+    </div>
+
+    <div class="game-over-overlay" id="gameOverOverlay">
+        <div class="game-over-card" id="gameOverCard"></div>
+    </div>
+
+    <script>
+    // =============================================
+    // GESUNDHEITSPOLITIK VERWALTUNG - GAME ENGINE
+    // =============================================
+
+    const game = {
+        // --- STATE ---
+        day: 1,
+        budget: 30,
+        quality: 50,
+        justice: 30,
+        stakeholders: {
+            aok: 40,
+            doctors: 15,
+            greens: 25,
+            patients: 10,
+            employers: 15
+        },
+        gameOver: false,
+        decisions: [],
+        usedQuestions: {},       // Track which questions each stakeholder has seen
+        eventCooldown: 0,       // Prevent event spam
+        policiesEnacted: [],    // Track enacted policies
+
+        // --- CLAMP HELPER ---
+        clamp(val, min = 0, max = 100) {
+            return Math.max(min, Math.min(max, val));
+        },
+
+        get satisfaction() {
+            const s = this.stakeholders;
+            return (s.aok + s.doctors + s.greens + s.patients + s.employers) / 5;
+        },
+
+        // --- INITIALIZATION ---
+        init() {
+            this.showStartDialog();
+            this.updateUI();
+        },
+
+        // --- NOTIFICATION SYSTEM ---
+        showNotification(title, text, type = 'info') {
+            const notif = document.getElementById('notification');
+            const notifTitle = document.getElementById('notifTitle');
+            const notifText = document.getElementById('notifText');
+            notif.className = 'notification ' + type;
+            notifTitle.textContent = title;
+            notifText.textContent = text;
+            notif.classList.add('show');
+            setTimeout(() => notif.classList.remove('show'), 4000);
+        },
+
+        // --- UI UPDATE ---
+        updateUI() {
+            if (this.gameOver) return;
+
+            // Clamp all values
+            this.budget = this.clamp(this.budget);
+            this.quality = this.clamp(this.quality);
+            this.justice = this.clamp(this.justice);
+            for (const key in this.stakeholders) {
+                this.stakeholders[key] = this.clamp(this.stakeholders[key]);
+            }
+
+            const sat = this.satisfaction;
+
+            // Update metric values
+            this.setMetric('budget', this.budget);
+            this.setMetric('satisfaction', sat);
+            this.setMetric('quality', this.quality);
+            this.setMetric('justice', this.justice);
+
+            // Update stakeholder bars
+            const items = document.querySelectorAll('.stakeholder-item');
+            const vals = [this.stakeholders.aok, this.stakeholders.doctors, this.stakeholders.greens, this.stakeholders.patients, this.stakeholders.employers];
+            items.forEach((item, i) => {
+                const fill = item.querySelector('.stakeholder-satisfaction-fill');
+                const span = item.querySelector('span:last-child');
+                const v = Math.round(vals[i]);
+                fill.style.width = v + '%';
+                fill.style.background = v < 25 ? 'var(--danger)' : v < 50 ? 'var(--warning)' : 'var(--success)';
+                span.textContent = v + '%';
+            });
+
+            // Update day display
+            document.getElementById('dayDisplay').textContent = `Tag ${Math.min(this.day, 90)} von 90`;
+            document.getElementById('dayProgressFill').style.width = (this.day / 90 * 100) + '%';
+
+            // Phase display
+            let phase, phaseText;
+            if (this.day <= 15) { phase = 'Phase 1: Orientierung'; phaseText = 'Stakeholder geben dir Zeit zum Einarbeiten'; }
+            else if (this.day <= 45) { phase = 'Phase 2: Verhandlung'; phaseText = 'Der Druck steigt - Stakeholder erwarten Ergebnisse'; }
+            else if (this.day <= 75) { phase = 'Phase 3: Entscheidung'; phaseText = 'Du musst dich festlegen - keine halben Sachen mehr'; }
+            else { phase = 'Phase 4: Umsetzung'; phaseText = 'Konsequenzen werden sichtbar - das Finale naht'; }
+
+            document.getElementById('phaseBadge').textContent = phase;
+            document.getElementById('phaseDisplay').textContent = phaseText;
+
+            // Disable buttons if game over
+            this.updateButtons();
+
+            // Check game end
+            if (this.day > 90 && !this.gameOver) {
+                this.endGame();
+            }
+        },
+
+        setMetric(id, value) {
+            const v = Math.round(value);
+            const valEl = document.getElementById(id + 'Value');
+            const barEl = document.getElementById(id + 'Bar');
+
+            valEl.textContent = v + '%';
+            barEl.style.width = v + '%';
+
+            // Color coding
+            valEl.className = 'metric-value';
+            barEl.className = 'progress-fill';
+            if (v < 30) { valEl.classList.add('critical'); barEl.classList.add('critical'); }
+            else if (v < 55) { valEl.classList.add('warning'); barEl.classList.add('warning'); }
+            else { valEl.classList.add('good'); }
+        },
+
+        showDelta(id, delta) {
+            const el = document.getElementById(id + 'Delta');
+            if (!el || delta === 0) return;
+            el.textContent = (delta > 0 ? '+' : '') + Math.round(delta);
+            el.className = 'metric-delta show ' + (delta > 0 ? 'positive' : 'negative');
+            // Pulse the card
+            const card = document.getElementById(id + 'Card');
+            if (card) { card.classList.remove('pulse'); void card.offsetWidth; card.classList.add('pulse'); }
+            setTimeout(() => el.classList.remove('show'), 2500);
+        },
+
+        updateButtons() {
+            const btns = document.querySelectorAll('.action-btn');
+            btns.forEach(btn => btn.disabled = this.gameOver);
+        },
+
+        // --- DIALOG HELPERS ---
+        setDialog(title, contentHTML, optionsHTML) {
+            document.getElementById('dialogTitle').textContent = title;
+            document.getElementById('dialogContent').innerHTML = contentHTML;
+            document.getElementById('dialogOptions').innerHTML = optionsHTML;
+        },
+
+        // --- START ---
+        showStartDialog() {
+            this.setDialog(
+                'Willkommen, Minister:in!',
+                `<p>Du bist gerade zum/r Bundesgesundheitsminister:in ernannt worden.</p>
+                <p style="margin-top:10px;"><strong>Die Situation ist kritisch:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Massive Kritik an der Krankenhausreform von allen Seiten</li>
+                    <li>Finanzierungslücke: <strong>17 Milliarden Euro</strong></li>
+                    <li>Koalitionspartner (Grüne) fordern progressive Gesundheitspolitik</li>
+                    <li>Ärzte drohen mit Streik - Honorare seit 2022 nicht angepasst</li>
+                    <li>Landärzte verschwinden - Brandenburg: -20% in 5 Jahren</li>
+                    <li>Patientenverbände fordern Zugang zu innovativen Therapien</li>
+                </ul>
+                <div class="warning-box" style="margin-top:15px;">
+                    <strong>Dein Auftrag:</strong> Schließe die 17-Mrd-Lücke, halte die Stakeholder zufrieden und verbessere die Versorgungsqualität. Du hast <strong>90 Tage</strong> bis zur Haushalts-Debatte im Bundestag.
+                </div>`,
+                `<button class="option-btn" onclick="game.startGame()">
+                    <strong>Spiel starten</strong>
+                    <span class="option-description">Beginne deine 90 Tage als Minister:in</span>
+                </button>`
+            );
+        },
+
+        startGame() {
+            this.showActionMenu();
+        },
+
+        // --- MAIN ACTION MENU ---
+        showActionMenu() {
+            if (this.gameOver) return;
+            const criticals = [];
+            if (this.budget < 25) criticals.push('Budget kritisch niedrig!');
+            if (this.satisfaction < 20) criticals.push('Stakeholder extrem unzufrieden!');
+            if (this.quality < 30) criticals.push('Versorgungsqualität mangelhaft!');
+
+            let alertHTML = '';
+            if (criticals.length > 0) {
+                alertHTML = `<div class="danger-box"><strong>Warnung:</strong> ${criticals.join(' ')}</div>`;
+            }
+
+            this.setDialog(
+                'Was möchtest du tun?',
+                `<p>Tag ${Math.min(this.day, 90)} von 90 - Wähle deine nächste Aktion.</p>
+                <div class="info-box">
+                    <strong>Aktueller Status:</strong><br>
+                    Budget: ${Math.round(this.budget)}% | Zufriedenheit: ${Math.round(this.satisfaction)}% | Qualität: ${Math.round(this.quality)}% | Gerechtigkeit: ${Math.round(this.justice)}%
+                </div>
+                ${alertHTML}
+                ${this.decisions.length > 0 ? '<p style="font-size:0.9em;color:#888;">Bisherige Entscheidungen: ' + this.decisions.length + '</p>' : ''}`,
+                `<button class="option-btn" onclick="game.showDecisionMenu()">
+                    <strong>Mit Stakeholder verhandeln</strong>
+                    <span class="option-description">Führe Gespräche und triff Entscheidungen</span>
+                </button>
+                <button class="option-btn" onclick="game.showPolicyMenu()">
+                    <strong>Reform-Paket entwerfen</strong>
+                    <span class="option-description">Strukturelle Maßnahmen beschließen</span>
+                </button>
+                <button class="option-btn" onclick="game.skipDays()">
+                    <strong>5 Tage überspringen</strong>
+                    <span class="option-description">Abwarten - aber die Lage kann sich verschlechtern</span>
+                </button>
+                <button class="option-btn" onclick="game.showBudgetInfo()">
+                    <strong>Budget-Details ansehen</strong>
+                    <span class="option-description">Überblick über Finanzen und Ausgaben</span>
+                </button>`
+            );
+        },
+
+        // =============================================
+        // STAKEHOLDER QUESTIONS DATABASE
+        // =============================================
+        getStakeholderQuestions() {
+            return {
+                aok: [
+                    {
+                        title: 'Finanzierungskrise',
+                        message: '"Minister:in, ohne massive Erhöhung der Steuerfinanzierung muss ich den Beitragssatz erhöhen. Das können die Arbeitgeber nicht tragen. Was ist Ihr Plan?"',
+                        options: [
+                            {
+                                text: 'Progressive Steuer: +0,75% auf Einkommen über 100.000 Euro',
+                                effects: { budget: 12, quality: -2, justice: 12, aok: 25, doctors: 5, greens: 10, patients: 5, employers: 15 },
+                                consequence: 'Die progressive Steuer bringt erhebliche Einnahmen. Arbeitgeber sind erleichtert, dass die Lohnnebenkosten stabil bleiben. Kritiker warnen vor Kapitalflucht.'
+                            },
+                            {
+                                text: 'Beitragssätze +0,5% (Arbeitgeber und Arbeitnehmer je hälftig)',
+                                effects: { budget: 8, quality: -3, justice: -8, aok: 15, doctors: 0, greens: -10, patients: -5, employers: -20 },
+                                consequence: 'Die Beitragserhöhung stabilisiert die Kassen, aber die Arbeitgeber sind wütend. Geringverdiener werden überproportional belastet.'
+                            },
+                            {
+                                text: 'Effizienzprogramm: Digitalisierung und Bürokratieabbau (3 Mrd Investition)',
+                                effects: { budget: -3, quality: 8, justice: 3, aok: 10, doctors: 8, greens: 5, patients: 3, employers: 5 },
+                                consequence: 'Langfristig vielversprechend, aber die Einsparungen kommen erst in 2-3 Jahren. Die AOK hätte gerne schnellere Lösungen.'
+                            }
+                        ]
+                    },
+                    {
+                        title: 'Krankenhausreform-Streit',
+                        message: '"Die Krankenhäuser laufen Sturm gegen unsere Reform. 40% der kleinen Häuser drohen mit Insolvenz. Wir brauchen einen Rettungsschirm oder eine Kurskorrektur!"',
+                        options: [
+                            {
+                                text: 'Rettungsschirm: 5 Mrd Euro Soforthilfe für bedrohte Krankenhäuser',
+                                effects: { budget: -8, quality: 12, justice: 5, aok: -5, doctors: 15, greens: -5, patients: 15, employers: -10 },
+                                consequence: 'Die Krankenhäuser atmen auf, aber die Kassen müssen die Kosten mittragen. Kritiker sehen es als Verschwendung an unwirtschaftlichen Strukturen.'
+                            },
+                            {
+                                text: 'Gezielte Umstrukturierung: Kleine Häuser zu ambulanten Zentren umbauen',
+                                effects: { budget: -3, quality: 8, justice: 10, aok: 10, doctors: -5, greens: 12, patients: 5, employers: 5 },
+                                consequence: 'Ein kluger Kompromiss. Einige Ärzte verlieren ihren Arbeitsplatz, aber die Versorgung auf dem Land wird innovativer gestaltet.'
+                            },
+                            {
+                                text: 'Reform durchziehen wie geplant - der Markt regelt es',
+                                effects: { budget: 3, quality: -10, justice: -12, aok: 5, doctors: -15, greens: -8, patients: -20, employers: 10 },
+                                consequence: 'Kurzfristig spart es Geld, aber mehrere Krankenhäuser schließen. In ländlichen Regionen entstehen Versorgungslücken. Die Presse berichtet über Notfälle mit langen Anfahrtswegen.'
+                            }
+                        ]
+                    },
+                    {
+                        title: 'Arzneimittel-Kosten explodieren',
+                        message: '"Die Ausgaben für Medikamente sind um 12% gestiegen. Neue Krebstherapien kosten bis zu 400.000 Euro pro Patient. Wir brauchen eine Strategie!"',
+                        options: [
+                            {
+                                text: 'Preisverhandlungen verschärfen und Generika-Quote erhöhen',
+                                effects: { budget: 6, quality: -3, justice: 5, aok: 20, doctors: -8, greens: 5, patients: -5, employers: 10 },
+                                consequence: 'Die Kassen sparen Milliarden, aber die Pharmaindustrie droht mit Abwanderung. Einige innovative Medikamente kommen später auf den deutschen Markt.'
+                            },
+                            {
+                                text: 'Europäische Einkaufsgemeinschaft für Medikamente initiieren',
+                                effects: { budget: 4, quality: 5, justice: 8, aok: 15, doctors: 3, greens: 15, patients: 10, employers: 8 },
+                                consequence: 'Ein diplomatischer Erfolg! Die EU-Partner sind interessiert. Die Umsetzung dauert aber und die Pharmaindustrie lobbyiert dagegen.'
+                            },
+                            {
+                                text: 'Status quo beibehalten - Innovation hat ihren Preis',
+                                effects: { budget: -5, quality: 5, justice: -8, aok: -15, doctors: 5, greens: -10, patients: 3, employers: -10 },
+                                consequence: 'Die Kosten steigen weiter. Die AOK warnt vor einer Beitragsexplosion im nächsten Jahr. Patienten profitieren von schnellem Zugang zu neuen Therapien.'
+                            }
+                        ]
+                    }
+                ],
+                doctors: [
+                    {
+                        title: 'Honorar-Streik droht',
+                        message: '"Seit 2022 keine Honorar-Anpassung! Die Inflation hat uns 18% gekostet. Wenn bis Ende des Monats nichts passiert, streiken wir. Das ist kein Bluff!"',
+                        options: [
+                            {
+                                text: 'Sofortige Honorar-Erhöhung um 10% (kostet 6 Mrd)',
+                                effects: { budget: -8, quality: 12, justice: -3, aok: -10, doctors: 35, greens: -5, patients: 5, employers: -8 },
+                                consequence: 'Der Streik ist abgewendet! Aber die Kassen protestieren lautstark. Die Arbeitgeber fürchten steigende Beiträge.'
+                            },
+                            {
+                                text: 'Landarzt-Offensive: +50% Zuschlag für ländliche Praxen (3 Mrd)',
+                                effects: { budget: -4, quality: 15, justice: 18, aok: -3, doctors: 20, greens: 10, patients: 12, employers: -3 },
+                                consequence: 'Gezielt und effektiv! Die Versorgung auf dem Land verbessert sich spürbar. Stadtärzte fühlen sich aber benachteiligt.'
+                            },
+                            {
+                                text: 'Kompromiss: +5% Honorar + Bürokratieabbau-Paket',
+                                effects: { budget: -3, quality: 8, justice: 2, aok: -3, doctors: 12, greens: 3, patients: 3, employers: -2 },
+                                consequence: 'Ein pragmatischer Mittelweg. Die Ärzte sind nicht begeistert, aber der Streik wird verschoben. Der Bürokratieabbau wird begrüßt.'
+                            }
+                        ]
+                    },
+                    {
+                        title: 'Ärztemangel-Krise',
+                        message: '"In Brandenburg fehlen 800 Hausärzte. Die Wartezeiten betragen 6 Wochen. Junge Ärzte gehen lieber in die Schweiz. Wir brauchen einen Masterplan!"',
+                        options: [
+                            {
+                                text: 'Stipendienprogramm: Medizinstudium kostenlos gegen 5 Jahre Landarzt-Pflicht',
+                                effects: { budget: -3, quality: 5, justice: 15, aok: 5, doctors: 8, greens: 15, patients: 10, employers: 3 },
+                                consequence: 'Langfristig eine gute Lösung. Die ersten Ärzte kommen aber erst in 6 Jahren. Kurzfristig ändert sich wenig.'
+                            },
+                            {
+                                text: 'Telemedizin-Offensive: Jede Praxis bekommt digitale Infrastruktur',
+                                effects: { budget: -4, quality: 10, justice: 12, aok: 8, doctors: 5, greens: 12, patients: 15, employers: 5 },
+                                consequence: 'Patienten auf dem Land können endlich per Video zum Arzt. Ältere Patienten tun sich aber schwer mit der Technik.'
+                            },
+                            {
+                                text: 'Ausländische Ärzte anwerben: Vereinfachte Anerkennung + Sprachkurse',
+                                effects: { budget: -2, quality: 8, justice: 5, aok: 3, doctors: -10, greens: 8, patients: 8, employers: 5 },
+                                consequence: 'Schnelle Hilfe, aber die Ärztekammer protestiert wegen Qualitätsbedenken. Integration braucht Zeit und Ressourcen.'
+                            }
+                        ]
+                    },
+                    {
+                        title: 'Burnout in der Pflege',
+                        message: '"40% der Pflegekräfte denken ans Aufhören. Die Arbeitsbelastung ist unerträglich. Ohne Pflege bricht das ganze System zusammen!"',
+                        options: [
+                            {
+                                text: 'Pflege-Bonus: 5.000 Euro Prämie + verbindliche Personalschlüssel',
+                                effects: { budget: -6, quality: 15, justice: 10, aok: -5, doctors: 10, greens: 8, patients: 15, employers: -8 },
+                                consequence: 'Die Pflegekräfte fühlen sich endlich wertgeschätzt. Die Kosten sind hoch, aber die Versorgungsqualität steigt merklich.'
+                            },
+                            {
+                                text: 'Ausbildungsoffensive: 50.000 neue Pflegeplätze + bessere Bezahlung in Ausbildung',
+                                effects: { budget: -4, quality: 5, justice: 12, aok: 3, doctors: 5, greens: 12, patients: 8, employers: -3 },
+                                consequence: 'Investition in die Zukunft. Die Effekte kommen erst in 3 Jahren, aber das Signal ist wichtig.'
+                            },
+                            {
+                                text: 'Robotik und KI in der Pflege: Technologie als Entlastung',
+                                effects: { budget: -3, quality: 8, justice: -2, aok: 5, doctors: 3, greens: -3, patients: -5, employers: 10 },
+                                consequence: 'Innovativ, aber umstritten. Patienten wollen menschliche Zuwendung, keine Roboter. Arbeitgeber sehen Effizienzpotenzial.'
+                            }
+                        ]
+                    }
+                ],
+                greens: [
+                    {
+                        title: 'Prävention als Koalitionsziel',
+                        message: '"Die Koalitionsvereinbarung ist eindeutig: Prävention MUSS Top-3-Priorität sein. Wo bleibt die Investition? Unsere Basis wird ungeduldig!"',
+                        options: [
+                            {
+                                text: 'Großes Präventionspaket: 5 Mrd für Bewegung, Ernährung, Mental Health',
+                                effects: { budget: -7, quality: 10, justice: 15, aok: 5, doctors: 3, greens: 35, patients: 15, employers: -5 },
+                                consequence: 'Die Grünen sind begeistert! Gym-Gutscheine, Schulobst-Programme und psychologische Beratung werden ausgebaut. Langfristig sinken die Krankheitskosten.'
+                            },
+                            {
+                                text: 'Kompromiss: 2 Mrd Prävention + 2 Mrd Digitalisierung',
+                                effects: { budget: -5, quality: 8, justice: 10, aok: 8, doctors: 5, greens: 18, patients: 8, employers: 3 },
+                                consequence: 'Ein solider Kompromiss. Die Grünen hätten sich mehr gewünscht, akzeptieren aber die Kombination mit Digitalisierung.'
+                            },
+                            {
+                                text: 'Prävention verschieben - akute Krisen haben Vorrang',
+                                effects: { budget: 0, quality: -5, justice: -5, aok: 3, doctors: 0, greens: -35, patients: -10, employers: 5 },
+                                consequence: 'Die Grünen sind empört! Koalitionskrise droht. In der Presse wird über ein mögliches Platzen der Koalition spekuliert.'
+                            }
+                        ]
+                    },
+                    {
+                        title: 'Cannabis-Gesundheitspolitik',
+                        message: '"Die Legalisierung läuft, aber wir brauchen Präventionsprogramme und Suchtberatung. Das war Teil des Deals! Außerdem: Die Steuereinnahmen müssen ins Gesundheitssystem fließen."',
+                        options: [
+                            {
+                                text: 'Cannabis-Steuer zweckbinden: 1 Mrd/Jahr für Suchtprävention',
+                                effects: { budget: 3, quality: 5, justice: 8, aok: 5, doctors: 3, greens: 20, patients: 8, employers: 3 },
+                                consequence: 'Kluge Lösung! Die Einnahmen finanzieren Beratungsstellen und Aufklärungskampagnen. Auch die Ärzte begrüßen die Suchtprävention.'
+                            },
+                            {
+                                text: 'Minimalprogramm: Bestehende Suchtberatung leicht aufstocken',
+                                effects: { budget: -1, quality: 2, justice: 3, aok: 0, doctors: 0, greens: -8, patients: 3, employers: 0 },
+                                consequence: 'Zu wenig, finden die Grünen. Die Suchtberatungsstellen sind weiterhin überlastet. Es gibt Berichte über steigende Jugend-Konsumzahlen.'
+                            },
+                            {
+                                text: 'Umfassendes Suchtpräventionsgesetz (inkl. Alkohol und Tabak)',
+                                effects: { budget: -2, quality: 8, justice: 12, aok: 10, doctors: 5, greens: 25, patients: 12, employers: -8 },
+                                consequence: 'Mutig und weitreichend! Die Tabak- und Alkohollobby protestiert heftig, aber Gesundheitsexperten loben den ganzheitlichen Ansatz.'
+                            }
+                        ]
+                    },
+                    {
+                        title: 'Klimawandel und Gesundheit',
+                        message: '"Hitzewellen haben letzten Sommer 8.000 Tote verursacht. Wir brauchen einen Hitzeaktionsplan und klimaresistente Gesundheitsinfrastruktur!"',
+                        options: [
+                            {
+                                text: 'Nationaler Hitzeaktionsplan: Kühlräume, Warnsysteme, Schulungen (2 Mrd)',
+                                effects: { budget: -3, quality: 8, justice: 10, aok: 5, doctors: 5, greens: 22, patients: 15, employers: -3 },
+                                consequence: 'Deutschland bekommt endlich einen Hitzeaktionsplan wie Frankreich. Besonders ältere Menschen profitieren. Die Kommunen müssen aber mitziehen.'
+                            },
+                            {
+                                text: 'Forschungsprogramm: Klimawandel-Gesundheitsfolgen untersuchen',
+                                effects: { budget: -1, quality: 3, justice: 3, aok: 0, doctors: 5, greens: 5, patients: 3, employers: 0 },
+                                consequence: 'Wissenschaftlich sinnvoll, aber die Grünen finden es zu langsam. "Wir wissen genug, wir müssen handeln!", sagt die Fraktionsvorsitzende.'
+                            },
+                            {
+                                text: 'Kein Sonderprogramm - bestehende Strukturen reichen aus',
+                                effects: { budget: 0, quality: -5, justice: -8, aok: 0, doctors: -3, greens: -25, patients: -12, employers: 5 },
+                                consequence: 'Die Grünen sind fassungslos. Bei der nächsten Hitzewelle gibt es erneut viele Tote. Die Medien machen dich persönlich verantwortlich.'
+                            }
+                        ]
+                    }
+                ],
+                patients: [
+                    {
+                        title: 'CRISPR-Therapie Erstattung',
+                        message: '"Die neue CRISPR-Gentherapie kann Sichelzellanämie heilen - für 2 Millionen Euro pro Patient. 5.000 Menschen in Deutschland warten. Wenn ihr das nicht erstattet, habt ihr ein riesiges PR-Problem!"',
+                        options: [
+                            {
+                                text: 'Volle Erstattung für alle Patienten (500 Mio/Jahr)',
+                                effects: { budget: -7, quality: 15, justice: 20, aok: -10, doctors: 8, greens: 10, patients: 35, employers: -8 },
+                                consequence: 'Ein historischer Moment! Deutschland wird Vorreiter bei Gentherapien. Die Kosten sind enorm, aber die Lebensqualität der Betroffenen steigt dramatisch.'
+                            },
+                            {
+                                text: 'Selektive Erstattung: Nur schwere Fälle + Preisverhandlung',
+                                effects: { budget: -3, quality: 10, justice: 10, aok: 3, doctors: 5, greens: 5, patients: 18, employers: -2 },
+                                consequence: 'Ein pragmatischer Kompromiss. Die Hälfte der Patienten bekommt Zugang. Die anderen müssen warten oder klagen.'
+                            },
+                            {
+                                text: 'Erstattung ablehnen - zu teuer, Standardtherapien reichen',
+                                effects: { budget: 2, quality: -10, justice: -18, aok: 5, doctors: -5, greens: -12, patients: -30, employers: 5 },
+                                consequence: 'Massive Proteste! Betroffene Familien demonstrieren vor dem Ministerium. Die Bild-Zeitung titelt: "Minister:in verweigert Heilung!"'
+                            }
+                        ]
+                    },
+                    {
+                        title: 'Wartezeiten-Skandal',
+                        message: '"6 Monate Wartezeit für einen Facharzt-Termin! Privatpatienten kommen sofort dran. Das ist eine Zwei-Klassen-Medizin und verfassungswidrig!"',
+                        options: [
+                            {
+                                text: 'Terminservice-Garantie: Max. 4 Wochen Wartezeit gesetzlich verankern',
+                                effects: { budget: -4, quality: 12, justice: 18, aok: -5, doctors: -15, greens: 12, patients: 30, employers: -5 },
+                                consequence: 'Patienten jubeln, Ärzte protestieren! Die Umsetzung ist schwierig, aber das Signal ist klar: Gesundheit darf nicht vom Geldbeutel abhängen.'
+                            },
+                            {
+                                text: 'Digitale Terminvermittlung ausbauen + Anreize für schnelle Termine',
+                                effects: { budget: -2, quality: 8, justice: 8, aok: 3, doctors: 5, greens: 5, patients: 15, employers: 3 },
+                                consequence: 'Die App funktioniert gut in Städten, auf dem Land fehlt aber die digitale Infrastruktur. Ein Schritt in die richtige Richtung.'
+                            },
+                            {
+                                text: 'Bürgerversicherung einführen - gleiches System für alle',
+                                effects: { budget: 5, quality: 5, justice: 25, aok: -20, doctors: -25, greens: 20, patients: 25, employers: -15 },
+                                consequence: 'Die radikalste Option! Ärzte und Privatversicherer laufen Sturm. Aber die Mehrheit der Bevölkerung unterstützt die Idee in Umfragen.'
+                            }
+                        ]
+                    },
+                    {
+                        title: 'Psychische Gesundheit',
+                        message: '"Die Wartezeit für einen Therapieplatz beträgt 6 Monate. Seit Corona hat sich die Lage dramatisch verschlechtert. Besonders Kinder und Jugendliche leiden!"',
+                        options: [
+                            {
+                                text: 'Sofortprogramm: 10.000 neue Therapieplätze + niedrigschwellige Angebote (4 Mrd)',
+                                effects: { budget: -6, quality: 12, justice: 15, aok: -3, doctors: 8, greens: 18, patients: 28, employers: -3 },
+                                consequence: 'Ein dringend nötiger Schritt! Die Wartezeiten sinken spürbar. Besonders die Kinder- und Jugendpsychiatrie profitiert.'
+                            },
+                            {
+                                text: 'Online-Therapie-Plattform: KI-gestützte Erstberatung + Vermittlung',
+                                effects: { budget: -2, quality: 6, justice: 5, aok: 5, doctors: -5, greens: 8, patients: 12, employers: 5 },
+                                consequence: 'Innovativ und kostengünstig. Therapeuten kritisieren die "Therapie light", aber für leichte Fälle ist es eine echte Hilfe.'
+                            },
+                            {
+                                text: 'Arbeitgeber in die Pflicht: Betriebliche Gesundheitsförderung verpflichtend',
+                                effects: { budget: 0, quality: 5, justice: 8, aok: 3, doctors: 3, greens: 12, patients: 10, employers: -18 },
+                                consequence: 'Die Arbeitgeber protestieren gegen die Kosten. Aber die Krankheitstage sinken messbar in Unternehmen mit guten Programmen.'
+                            }
+                        ]
+                    }
+                ],
+                employers: [
+                    {
+                        title: 'Lohnnebenkosten-Debatte',
+                        message: '"Wenn ihr nochmal +1% auf die Beitragssätze draufpackt, wandern Jobs ab. Deutschland ist schon jetzt Hochsteuerland! Finanziert das über Steuern, nicht über Arbeit!"',
+                        options: [
+                            {
+                                text: 'Progressive Steuer statt Beitragserhöhung: Vermögensabgabe für Gesundheit',
+                                effects: { budget: 10, quality: 3, justice: 15, aok: 10, doctors: 3, greens: 15, patients: 8, employers: 25 },
+                                consequence: 'Die Arbeitgeber sind erleichtert! Die Vermögenden protestieren, aber die Mehrheit der Bevölkerung unterstützt die Umverteilung.'
+                            },
+                            {
+                                text: 'Gemischter Ansatz: +0,3% Beitrag + moderate Steuererhöhung',
+                                effects: { budget: 7, quality: 2, justice: 5, aok: 8, doctors: 0, greens: 5, patients: 3, employers: 8 },
+                                consequence: 'Niemand ist begeistert, aber alle können damit leben. Ein typisch deutscher Kompromiss.'
+                            },
+                            {
+                                text: 'Nur Beitragserhöhung +0,8% - einfach und schnell umsetzbar',
+                                effects: { budget: 8, quality: -3, justice: -10, aok: 5, doctors: 0, greens: -8, patients: -5, employers: -25 },
+                                consequence: 'Die Arbeitgeber sind empört! Erste Unternehmen verlagern Stellen ins Ausland. Die Grünen kritisieren die soziale Schieflage.'
+                            }
+                        ]
+                    },
+                    {
+                        title: 'Fachkräftemangel im Gesundheitswesen',
+                        message: '"Wir können keine Pflegekräfte finden! Die Bürokratie bei der Anerkennung ausländischer Abschlüsse dauert 18 Monate. Das muss schneller gehen!"',
+                        options: [
+                            {
+                                text: 'Fast-Track-Anerkennung: 3 Monate statt 18 + Willkommensprogramm',
+                                effects: { budget: -2, quality: 8, justice: 8, aok: 5, doctors: -5, greens: 8, patients: 8, employers: 20 },
+                                consequence: 'Die Bürokratie wird abgebaut! Innerhalb eines Jahres kommen 15.000 neue Fachkräfte. Die Ärztekammer hat Qualitätsbedenken.'
+                            },
+                            {
+                                text: 'Ausbildungsoffensive: Staatlich finanzierte Umschulung für Quereinsteiger',
+                                effects: { budget: -3, quality: 5, justice: 10, aok: 3, doctors: 3, greens: 10, patients: 5, employers: 12 },
+                                consequence: 'Langfristig eine gute Investition. Die ersten Absolventen sind in 2 Jahren einsatzbereit.'
+                            },
+                            {
+                                text: 'Lohnerhöhung in der Pflege: Mindestens 4.000 Euro brutto Einstiegsgehalt',
+                                effects: { budget: -5, quality: 10, justice: 12, aok: -8, doctors: 5, greens: 12, patients: 12, employers: -10 },
+                                consequence: 'Die Pflege wird attraktiver! Aber die Kosten steigen und werden auf die Pflegebedürftigen umgelegt. Heimbewohner zahlen mehr.'
+                            }
+                        ]
+                    },
+                    {
+                        title: 'Betriebliche Gesundheitskosten',
+                        message: '"Die Krankheitstage sind auf Rekordniveau: 20 Tage pro Mitarbeiter im Schnitt. Das kostet die Wirtschaft 90 Milliarden Euro jährlich. Wir brauchen Lösungen!"',
+                        options: [
+                            {
+                                text: 'Steuerliche Anreize für betriebliche Gesundheitsförderung (1 Mrd)',
+                                effects: { budget: -2, quality: 5, justice: 3, aok: 5, doctors: 3, greens: 8, patients: 5, employers: 18 },
+                                consequence: 'Win-Win! Unternehmen investieren in Gesundheit, die Krankheitstage sinken. Der Staat verliert Steuereinnahmen, spart aber bei den Kassen.'
+                            },
+                            {
+                                text: 'Verpflichtende Gesundheitschecks für alle Arbeitnehmer',
+                                effects: { budget: -1, quality: 8, justice: 5, aok: 8, doctors: 10, greens: 5, patients: 8, employers: -5 },
+                                consequence: 'Früherkennung rettet Leben! Aber Arbeitgeber klagen über den Organisationsaufwand und Datenschutzbedenken.'
+                            },
+                            {
+                                text: 'Karenztag wieder einführen: Erster Krankheitstag ohne Lohnfortzahlung',
+                                effects: { budget: 3, quality: -8, justice: -15, aok: -5, doctors: -10, greens: -25, patients: -20, employers: 20 },
+                                consequence: 'Die Arbeitgeber jubeln, alle anderen sind empört! Gewerkschaften drohen mit Generalstreik. Die Grünen erwägen den Koalitionsbruch.'
+                            }
+                        ]
+                    }
+                ]
+            };
+        },
+
+        // =============================================
+        // POLICY OPTIONS
+        // =============================================
+        getPolicies() {
+            return [
+                {
+                    id: 'digitalization',
+                    name: 'Digitalisierungsgesetz',
+                    description: 'Elektronische Patientenakte verpflichtend + Telemedizin-Ausbau',
+                    effects: { budget: -4, quality: 12, justice: 8, aok: 8, doctors: 5, greens: 8, patients: 10, employers: 8 },
+                    days: 8
+                },
+                {
+                    id: 'prevention_law',
+                    name: 'Präventionsgesetz 2.0',
+                    description: 'Nationale Strategie für Prävention: Bewegung, Ernährung, Mental Health',
+                    effects: { budget: -5, quality: 8, justice: 12, aok: 5, doctors: 3, greens: 25, patients: 12, employers: -3 },
+                    days: 10
+                },
+                {
+                    id: 'hospital_reform',
+                    name: 'Krankenhausstrukturgesetz',
+                    description: 'Qualitätskriterien verschärfen, Spezialisierung fördern, kleine Häuser umwandeln',
+                    effects: { budget: -2, quality: 15, justice: 5, aok: 10, doctors: -8, greens: 5, patients: 8, employers: 5 },
+                    days: 12
+                },
+                {
+                    id: 'pharma_reform',
+                    name: 'Arzneimittelpreisreform',
+                    description: 'Preisbremse für patentgeschützte Medikamente + Generika-Förderung',
+                    effects: { budget: 8, quality: -3, justice: 8, aok: 18, doctors: -5, greens: 5, patients: -5, employers: 10 },
+                    days: 6
+                },
+                {
+                    id: 'nursing_pact',
+                    name: 'Pflegepakt Deutschland',
+                    description: 'Bessere Bezahlung, Personalschlüssel, Ausbildungsoffensive in der Pflege',
+                    effects: { budget: -6, quality: 15, justice: 15, aok: -3, doctors: 8, greens: 12, patients: 18, employers: -5 },
+                    days: 8
+                },
+                {
+                    id: 'equity_fund',
+                    name: 'Gesundheits-Gerechtigkeitsfonds',
+                    description: 'Sonderfonds für benachteiligte Regionen und Bevölkerungsgruppen',
+                    effects: { budget: -4, quality: 5, justice: 22, aok: 3, doctors: 3, greens: 18, patients: 20, employers: -5 },
+                    days: 6
+                }
+            ];
+        },
+
+        // =============================================
+        // RANDOM EVENTS
+        // =============================================
+        getRandomEvents() {
+            return [
+                {
+                    title: 'Grippewelle!',
+                    text: 'Eine schwere Grippewelle überlastet die Krankenhäuser. Die Intensivstationen sind zu 95% ausgelastet.',
+                    effects: { budget: -3, quality: -8, justice: -3, patients: -8, doctors: -5 },
+                    type: 'crisis'
+                },
+                {
+                    title: 'Pharma-Skandal',
+                    text: 'Ein großer Pharmahersteller hat Studiendaten gefälscht. Das Vertrauen in Medikamente sinkt.',
+                    effects: { budget: 0, quality: -5, justice: -5, patients: -10, aok: -5 },
+                    type: 'crisis'
+                },
+                {
+                    title: 'Positiver Bericht',
+                    text: 'Die WHO lobt Deutschlands Gesundheitssystem als vorbildlich in Europa.',
+                    effects: { budget: 0, quality: 5, justice: 3, patients: 5, greens: 5 },
+                    type: 'success'
+                },
+                {
+                    title: 'Ärztestreik in Bayern',
+                    text: 'Niedergelassene Ärzte in Bayern treten in einen zweitägigen Warnstreik.',
+                    effects: { budget: 0, quality: -5, justice: -3, doctors: -10, patients: -8 },
+                    type: 'crisis'
+                },
+                {
+                    title: 'Digitalisierungs-Durchbruch',
+                    text: 'Die elektronische Patientenakte erreicht 10 Millionen Nutzer. Die Effizienz steigt.',
+                    effects: { budget: 2, quality: 5, justice: 3, aok: 5, doctors: 3 },
+                    type: 'success'
+                },
+                {
+                    title: 'Krankenhausinsolvenz',
+                    text: 'Ein großes Krankenhaus in Sachsen meldet Insolvenz an. 2.000 Arbeitsplätze sind bedroht.',
+                    effects: { budget: -2, quality: -8, justice: -10, patients: -12, doctors: -5, employers: -5 },
+                    type: 'crisis'
+                },
+                {
+                    title: 'EU-Fördergelder',
+                    text: 'Die EU bewilligt 2 Mrd Euro Fördergelder für Gesundheitsdigitalisierung in Deutschland.',
+                    effects: { budget: 5, quality: 3, justice: 2, aok: 3, greens: 5 },
+                    type: 'success'
+                },
+                {
+                    title: 'Pflegekräfte-Demo',
+                    text: '50.000 Pflegekräfte demonstrieren in Berlin für bessere Arbeitsbedingungen.',
+                    effects: { budget: 0, quality: -3, justice: -5, doctors: -5, patients: -5, greens: -5 },
+                    type: 'crisis'
+                },
+                {
+                    title: 'Medien-Lob',
+                    text: 'Der Spiegel veröffentlicht einen positiven Artikel über deine Reformbemühungen.',
+                    effects: { budget: 0, quality: 0, justice: 0, patients: 5, greens: 5, aok: 3 },
+                    type: 'success'
+                },
+                {
+                    title: 'Hitzewelle',
+                    text: 'Eine extreme Hitzewelle fordert 3.000 zusätzliche Todesfälle. Die Notaufnahmen sind überlastet.',
+                    effects: { budget: -2, quality: -6, justice: -5, patients: -10, greens: -8, doctors: -3 },
+                    type: 'crisis'
+                }
+            ];
+        },
+
+        // =============================================
+        // GAME LOGIC
+        // =============================================
+
+        showDecisionMenu() {
+            if (this.gameOver) return;
+
+            this.setDialog(
+                'Verhandlungen starten',
+                `<p>Wähle einen Stakeholder zum Verhandeln. Jede Verhandlung beeinflusst mehrere Bereiche - es gibt immer Trade-offs!</p>
+                <div class="warning-box">
+                    <strong>Beachte:</strong> Du kannst nicht alle glücklich machen. Jede Entscheidung hat Konsequenzen für das gesamte System!
+                </div>`,
+                `<button class="option-btn" onclick="game.negotiateStakeholder('aok')">
+                    <strong>AOK-Krankenkasse</strong>
+                    <span class="option-description">Zufriedenheit: ${Math.round(this.stakeholders.aok)}% | Fokus: Finanzierung und Stabilität</span>
+                </button>
+                <button class="option-btn" onclick="game.negotiateStakeholder('doctors')">
+                    <strong>Kassenärztliche Vereinigung</strong>
+                    <span class="option-description">Zufriedenheit: ${Math.round(this.stakeholders.doctors)}% | Fokus: Honorare und Arbeitsbedingungen</span>
+                </button>
+                <button class="option-btn" onclick="game.negotiateStakeholder('greens')">
+                    <strong>Grüne (Koalitionspartner)</strong>
+                    <span class="option-description">Zufriedenheit: ${Math.round(this.stakeholders.greens)}% | Fokus: Prävention und Nachhaltigkeit</span>
+                </button>
+                <button class="option-btn" onclick="game.negotiateStakeholder('patients')">
+                    <strong>Patienten-Organisationen</strong>
+                    <span class="option-description">Zufriedenheit: ${Math.round(this.stakeholders.patients)}% | Fokus: Zugang und Gerechtigkeit</span>
+                </button>
+                <button class="option-btn" onclick="game.negotiateStakeholder('employers')">
+                    <strong>Arbeitgeberverband</strong>
+                    <span class="option-description">Zufriedenheit: ${Math.round(this.stakeholders.employers)}% | Fokus: Stabile Lohnnebenkosten</span>
+                </button>
+                <button class="option-btn back-btn" onclick="game.showActionMenu()">
+                    <strong>Zurück zum Menü</strong>
+                </button>`
+            );
+        },
+
+        negotiateStakeholder(stakeholder) {
+            if (this.gameOver) return;
+
+            const allQuestions = this.getStakeholderQuestions()[stakeholder];
+            if (!this.usedQuestions[stakeholder]) this.usedQuestions[stakeholder] = [];
+
+            // Find unused questions
+            let available = allQuestions.filter((_, i) => !this.usedQuestions[stakeholder].includes(i));
+            if (available.length === 0) {
+                // Reset if all used
+                this.usedQuestions[stakeholder] = [];
+                available = allQuestions;
+            }
+
+            // Pick random from available
+            const randomIdx = Math.floor(Math.random() * available.length);
+            const question = available[randomIdx];
+            const originalIdx = allQuestions.indexOf(question);
+            this.usedQuestions[stakeholder].push(originalIdx);
+
+            const stakeholderNames = {
+                aok: 'AOK-Krankenkasse', doctors: 'Kassenärztliche Vereinigung',
+                greens: 'Grüne (Koalitionspartner)', patients: 'Patienten-Organisationen',
+                employers: 'Arbeitgeberverband'
+            };
+
+            let optionsHTML = question.options.map((opt, i) => {
+                const impacts = [];
+                if (opt.effects.budget > 0) impacts.push(`<span class="impact-tag positive">Budget +${opt.effects.budget}</span>`);
+                if (opt.effects.budget < 0) impacts.push(`<span class="impact-tag negative">Budget ${opt.effects.budget}</span>`);
+                if (opt.effects.quality > 5) impacts.push(`<span class="impact-tag positive">Qualität +</span>`);
+                if (opt.effects.quality < -5) impacts.push(`<span class="impact-tag negative">Qualität -</span>`);
+                if (opt.effects.justice > 5) impacts.push(`<span class="impact-tag positive">Gerechtigkeit +</span>`);
+                if (opt.effects.justice < -5) impacts.push(`<span class="impact-tag negative">Gerechtigkeit -</span>`);
+
+                return `<button class="option-btn" onclick="game.executeNegotiation('${stakeholder}', ${originalIdx}, ${i})">
+                    <strong>${opt.text}</strong>
+                    <div class="impact-preview">${impacts.join('')}</div>
+                </button>`;
+            }).join('');
+
+            optionsHTML += `<button class="option-btn back-btn" onclick="game.showDecisionMenu()"><strong>Zurück</strong></button>`;
+
+            this.setDialog(
+                `${stakeholderNames[stakeholder]} - ${question.title}`,
+                `<p style="font-style: italic; color: var(--primary); font-size: 1.05em;">${question.message}</p>`,
+                optionsHTML
+            );
+        },
+
+        executeNegotiation(stakeholder, questionIdx, optionIdx) {
+            if (this.gameOver) return;
+
+            const question = this.getStakeholderQuestions()[stakeholder][questionIdx];
+            const option = question.options[optionIdx];
+            const effects = option.effects;
+
+            // Store old values for delta display
+            const oldBudget = this.budget;
+            const oldQuality = this.quality;
+            const oldJustice = this.justice;
+            const oldSat = this.satisfaction;
+
+            // Apply effects
+            this.budget += effects.budget || 0;
+            this.quality += effects.quality || 0;
+            this.justice += effects.justice || 0;
+            if (effects.aok) this.stakeholders.aok += effects.aok;
+            if (effects.doctors) this.stakeholders.doctors += effects.doctors;
+            if (effects.greens) this.stakeholders.greens += effects.greens;
+            if (effects.patients) this.stakeholders.patients += effects.patients;
+            if (effects.employers) this.stakeholders.employers += effects.employers;
+
+            // Advance time
+            this.day += 5;
+
+            // Record decision
+            this.decisions.push({
+                day: this.day,
+                type: 'Verhandlung',
+                stakeholder: stakeholder,
+                text: option.text
+            });
+
+            this.updateUI();
+
+            // Show deltas
+            this.showDelta('budget', this.budget - oldBudget);
+            this.showDelta('quality', this.quality - oldQuality);
+            this.showDelta('justice', this.justice - oldJustice);
+            this.showDelta('satisfaction', this.satisfaction - oldSat);
+
+            // Show result
+            this.setDialog(
+                'Verhandlung abgeschlossen',
+                `<p><strong>Deine Entscheidung:</strong> ${option.text}</p>
+                <div class="info-box">
+                    <p><strong>Konsequenz:</strong></p>
+                    <p style="margin-top:8px;">${option.consequence}</p>
+                </div>
+                <div style="margin-top:15px; display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.9em;">
+                    <div>Budget: <strong style="color:${effects.budget >= 0 ? 'var(--success)' : 'var(--danger)'}">${effects.budget >= 0 ? '+' : ''}${effects.budget}%</strong></div>
+                    <div>Qualität: <strong style="color:${effects.quality >= 0 ? 'var(--success)' : 'var(--danger)'}">${effects.quality >= 0 ? '+' : ''}${effects.quality}%</strong></div>
+                    <div>Gerechtigkeit: <strong style="color:${effects.justice >= 0 ? 'var(--success)' : 'var(--danger)'}">${effects.justice >= 0 ? '+' : ''}${effects.justice}%</strong></div>
+                </div>`,
+                `<button class="option-btn" onclick="game.afterAction()">
+                    <strong>Weiter (Tag ${Math.min(this.day, 90)} von 90)</strong>
+                </button>`
+            );
+        },
+
+        showPolicyMenu() {
+            if (this.gameOver) return;
+
+            const policies = this.getPolicies();
+            let optionsHTML = policies.map(p => {
+                const enacted = this.policiesEnacted.includes(p.id);
+                const impacts = [];
+                if (p.effects.budget > 0) impacts.push(`<span class="impact-tag positive">Budget +${p.effects.budget}</span>`);
+                if (p.effects.budget < 0) impacts.push(`<span class="impact-tag negative">Budget ${p.effects.budget}</span>`);
+                if (p.effects.quality > 5) impacts.push(`<span class="impact-tag positive">Qualität +</span>`);
+                if (p.effects.justice > 5) impacts.push(`<span class="impact-tag positive">Gerechtigkeit +</span>`);
+
+                if (enacted) {
+                    return `<button class="option-btn" disabled style="opacity:0.5;cursor:not-allowed;">
+                        <strong>${p.name} (bereits beschlossen)</strong>
+                        <span class="option-description">${p.description}</span>
+                    </button>`;
+                }
+                return `<button class="option-btn" onclick="game.enactPolicy('${p.id}')">
+                    <strong>${p.name}</strong>
+                    <span class="option-description">${p.description} | Dauer: ${p.days} Tage</span>
+                    <div class="impact-preview">${impacts.join('')}</div>
+                </button>`;
+            }).join('');
+
+            optionsHTML += `<button class="option-btn back-btn" onclick="game.showActionMenu()"><strong>Zurück zum Menü</strong></button>`;
+
+            this.setDialog(
+                'Reform-Paket entwerfen',
+                `<p>Beschließe strukturelle Reformen. Jede Reform kostet Zeit und Ressourcen, hat aber langfristige Auswirkungen.</p>
+                <div class="info-box">
+                    <strong>Tipp:</strong> Kombiniere mehrere Reformen für maximale Wirkung. Aber Vorsicht: Jede Reform kostet Tage!
+                </div>`,
+                optionsHTML
+            );
+        },
+
+        enactPolicy(policyId) {
+            if (this.gameOver) return;
+
+            const policy = this.getPolicies().find(p => p.id === policyId);
+            if (!policy || this.policiesEnacted.includes(policyId)) return;
+
+            const oldBudget = this.budget;
+            const oldQuality = this.quality;
+            const oldJustice = this.justice;
+            const oldSat = this.satisfaction;
+
+            // Apply effects
+            this.budget += policy.effects.budget || 0;
+            this.quality += policy.effects.quality || 0;
+            this.justice += policy.effects.justice || 0;
+            if (policy.effects.aok) this.stakeholders.aok += policy.effects.aok;
+            if (policy.effects.doctors) this.stakeholders.doctors += policy.effects.doctors;
+            if (policy.effects.greens) this.stakeholders.greens += policy.effects.greens;
+            if (policy.effects.patients) this.stakeholders.patients += policy.effects.patients;
+            if (policy.effects.employers) this.stakeholders.employers += policy.effects.employers;
+
+            this.day += policy.days;
+            this.policiesEnacted.push(policyId);
+
+            this.decisions.push({
+                day: this.day,
+                type: 'Reform',
+                text: policy.name
+            });
+
+            this.updateUI();
+
+            this.showDelta('budget', this.budget - oldBudget);
+            this.showDelta('quality', this.quality - oldQuality);
+            this.showDelta('justice', this.justice - oldJustice);
+            this.showDelta('satisfaction', this.satisfaction - oldSat);
+
+            this.showNotification('Reform beschlossen!', policy.name, 'success');
+
+            this.setDialog(
+                'Reform beschlossen!',
+                `<div class="success-box">
+                    <strong>${policy.name}</strong> wurde erfolgreich verabschiedet!
+                    <p style="margin-top:8px;">${policy.description}</p>
+                </div>
+                <div style="margin-top:15px; display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.9em;">
+                    <div>Budget: <strong style="color:${policy.effects.budget >= 0 ? 'var(--success)' : 'var(--danger)'}">${policy.effects.budget >= 0 ? '+' : ''}${policy.effects.budget}%</strong></div>
+                    <div>Qualität: <strong style="color:${policy.effects.quality >= 0 ? 'var(--success)' : 'var(--danger)'}">${policy.effects.quality >= 0 ? '+' : ''}${policy.effects.quality}%</strong></div>
+                    <div>Gerechtigkeit: <strong style="color:${policy.effects.justice >= 0 ? 'var(--success)' : 'var(--danger)'}">${policy.effects.justice >= 0 ? '+' : ''}${policy.effects.justice}%</strong></div>
+                </div>
+                <p style="margin-top:15px;font-size:0.9em;color:#888;">Dauer: ${policy.days} Tage | Beschlossene Reformen: ${this.policiesEnacted.length}</p>`,
+                `<button class="option-btn" onclick="game.afterAction()">
+                    <strong>Weiter (Tag ${Math.min(this.day, 90)} von 90)</strong>
+                </button>`
+            );
+        },
+
+        skipDays() {
+            if (this.gameOver) return;
+
+            // Skipping has consequences - things deteriorate
+            const decay = {
+                quality: -3,
+                justice: -2,
+                doctors: -4,
+                patients: -5,
+                greens: -3
+            };
+
+            this.quality += decay.quality;
+            this.justice += decay.justice;
+            this.stakeholders.doctors += decay.doctors;
+            this.stakeholders.patients += decay.patients;
+            this.stakeholders.greens += decay.greens;
+
+            this.day += 5;
+            this.updateUI();
+
+            this.showNotification('Tage übersprungen', 'Die Lage hat sich leicht verschlechtert...', 'event');
+
+            this.setDialog(
+                '5 Tage vergangen...',
+                `<div class="warning-box">
+                    <strong>Während du gewartet hast:</strong>
+                    <ul style="margin-left:20px;margin-top:8px;">
+                        <li>Ärzte werden ungeduldiger (${decay.doctors}%)</li>
+                        <li>Patienten fühlen sich vernachlässigt (${decay.patients}%)</li>
+                        <li>Grüne fordern Taten statt Worte (${decay.greens}%)</li>
+                        <li>Versorgungsqualität sinkt leicht (${decay.quality}%)</li>
+                    </ul>
+                </div>
+                <p style="margin-top:15px;font-style:italic;color:#888;">Untätigkeit hat ihren Preis. Die Stakeholder erwarten Ergebnisse!</p>`,
+                `<button class="option-btn" onclick="game.afterAction()">
+                    <strong>Weiter (Tag ${Math.min(this.day, 90)} von 90)</strong>
+                </button>`
+            );
+        },
+
+        afterAction() {
+            if (this.gameOver) return;
+
+            // Check for game end first
+            if (this.day > 90) {
+                this.endGame();
+                return;
+            }
+
+            // Random event chance (30% per action, with cooldown)
+            if (this.eventCooldown <= 0 && Math.random() < 0.3) {
+                this.triggerRandomEvent();
+                return;
+            }
+            this.eventCooldown--;
+
+            this.showActionMenu();
+        },
+
+        triggerRandomEvent() {
+            const events = this.getRandomEvents();
+            const event = events[Math.floor(Math.random() * events.length)];
+
+            // Apply effects
+            if (event.effects.budget) this.budget += event.effects.budget;
+            if (event.effects.quality) this.quality += event.effects.quality;
+            if (event.effects.justice) this.justice += event.effects.justice;
+            if (event.effects.aok) this.stakeholders.aok += event.effects.aok;
+            if (event.effects.doctors) this.stakeholders.doctors += event.effects.doctors;
+            if (event.effects.greens) this.stakeholders.greens += event.effects.greens;
+            if (event.effects.patients) this.stakeholders.patients += event.effects.patients;
+            if (event.effects.employers) this.stakeholders.employers += event.effects.employers;
+
+            this.eventCooldown = 2; // Prevent events for next 2 actions
+            this.updateUI();
+
+            const boxClass = event.type === 'crisis' ? 'danger-box' : 'success-box';
+            const icon = event.type === 'crisis' ? 'Krise!' : 'Neuigkeit!';
+
+            this.showNotification(icon, event.title, event.type);
+
+            this.setDialog(
+                `${event.type === 'crisis' ? 'KRISE' : 'EREIGNIS'}: ${event.title}`,
+                `<div class="${boxClass}">
+                    <p>${event.text}</p>
+                </div>
+                <div style="margin-top:15px; font-size:0.9em;">
+                    <strong>Auswirkungen:</strong>
+                    <ul style="margin-left:20px;margin-top:5px;">
+                        ${event.effects.budget ? `<li>Budget: ${event.effects.budget > 0 ? '+' : ''}${event.effects.budget}%</li>` : ''}
+                        ${event.effects.quality ? `<li>Qualität: ${event.effects.quality > 0 ? '+' : ''}${event.effects.quality}%</li>` : ''}
+                        ${event.effects.justice ? `<li>Gerechtigkeit: ${event.effects.justice > 0 ? '+' : ''}${event.effects.justice}%</li>` : ''}
+                    </ul>
+                </div>`,
+                `<button class="option-btn" onclick="game.showActionMenu()">
+                    <strong>Weiter</strong>
+                </button>`
+            );
+        },
+
+        showBudgetInfo() {
+            if (this.gameOver) return;
+
+            this.setDialog(
+                'Budget-Übersicht',
+                `<p><strong>Gesamtbudget Gesundheitswesen Deutschland:</strong> 450 Mrd Euro</p>
+                <table style="width: 100%; margin-top: 15px; border-collapse: collapse;">
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 8px;"><strong>Laufende Verpflichtungen:</strong></td>
+                        <td style="text-align: right; padding: 8px;">-370 Mrd (unveränderbar)</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 8px; padding-left:20px;">Krankenhäuser</td>
+                        <td style="text-align: right; padding: 8px;">-120 Mrd</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 8px; padding-left:20px;">Krankenkassen-Transfers</td>
+                        <td style="text-align: right; padding: 8px;">-220 Mrd</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding: 8px; padding-left:20px;">Verwaltung</td>
+                        <td style="text-align: right; padding: 8px;">-30 Mrd</td>
+                    </tr>
+                    <tr style="background: var(--light);">
+                        <td style="padding: 8px;"><strong>Verfügbar für Reformen:</strong></td>
+                        <td style="text-align: right; padding: 8px;"><strong>80 Mrd</strong></td>
+                    </tr>
+                </table>
+                <div class="danger-box" style="margin-top:15px;">
+                    <strong>Problem:</strong> Finanzierungslücke = 17 Mrd Euro. Ohne neue Einnahmen oder Einsparungen droht eine Beitragsexplosion!
+                </div>
+                <div class="info-box">
+                    <strong>Dein aktueller Status:</strong><br>
+                    Budget-Gesundheit: ${Math.round(this.budget)}% | Entscheidungen: ${this.decisions.length} | Reformen: ${this.policiesEnacted.length}
+                </div>`,
+                `<button class="option-btn back-btn" onclick="game.showActionMenu()">
+                    <strong>Zurück zum Menü</strong>
+                </button>`
+            );
+        },
+
+        // =============================================
+        // GAME END
+        // =============================================
+        endGame() {
+            this.gameOver = true;
+            this.updateButtons();
+
+            // Calculate final score
+            const score = Math.round((this.budget + this.satisfaction + this.quality + this.justice) / 4);
+
+            let grade, gradeClass, resultText, resultBg;
+            if (score >= 70) {
+                grade = 'S'; gradeClass = 'grade-S';
+                resultText = 'Herausragend! Du hast das Gesundheitssystem grundlegend reformiert und alle Stakeholder überzeugt. Die Haushalts-Debatte wird ein Triumph!';
+                resultBg = '#e8f8e8';
+            } else if (score >= 55) {
+                grade = 'A'; gradeClass = 'grade-A';
+                resultText = 'Sehr gut! Eine solide Reform mit breiter Unterstützung. Es gibt noch Verbesserungspotenzial, aber die Richtung stimmt.';
+                resultBg = '#e8f8e8';
+            } else if (score >= 40) {
+                grade = 'B'; gradeClass = 'grade-B';
+                resultText = 'Gut! Du hast wichtige Fortschritte erzielt, aber einige Stakeholder sind unzufrieden. Die Debatte wird kontrovers.';
+                resultBg = '#e8f4f8';
+            } else if (score >= 25) {
+                grade = 'C'; gradeClass = 'grade-C';
+                resultText = 'Befriedigend. Erste Schritte wurden gemacht, aber die Reform bleibt unvollständig. Die Opposition wittert ihre Chance.';
+                resultBg = '#fff3cd';
+            } else {
+                grade = 'D'; gradeClass = 'grade-D';
+                resultText = 'Mangelhaft. Die Reform ist gescheitert. Die Stakeholder sind enttäuscht, das Budget ist instabil. Ein Misstrauensvotum droht.';
+                resultBg = '#fde8e8';
+            }
+
+            // Build decisions log
+            let decisionsHTML = '';
+            if (this.decisions.length > 0) {
+                decisionsHTML = `<div class="decisions-log">
+                    <h3>Deine Entscheidungen (${this.decisions.length})</h3>
+                    ${this.decisions.map(d => `<div class="decision-item"><strong>Tag ${d.day}:</strong> [${d.type}] ${d.text}</div>`).join('')}
+                </div>`;
+            }
+
+            const scoreBarColor = (val) => val >= 60 ? 'var(--success)' : val >= 40 ? 'var(--warning)' : 'var(--danger)';
+
+            document.getElementById('gameOverCard').innerHTML = `
+                <h2>Haushalts-Debatte im Bundestag</h2>
+                <div style="text-align:center;margin-bottom:15px;">
+                    <span class="grade-badge ${gradeClass}">Note: ${grade}</span>
+                    <p style="font-size:0.9em;color:#888;">Gesamtpunktzahl: ${score}/100</p>
+                </div>
+                <div class="result-text" style="background:${resultBg};">
+                    ${resultText}
+                </div>
+                <div class="final-scores">
+                    <div class="final-score-item">
+                        <span>Budget-Gesundheit</span>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <strong>${Math.round(this.budget)}%</strong>
+                            <div class="score-bar-mini"><div class="score-bar-mini-fill" style="width:${this.budget}%;background:${scoreBarColor(this.budget)}"></div></div>
+                        </div>
+                    </div>
+                    <div class="final-score-item">
+                        <span>Stakeholder-Zufriedenheit</span>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <strong>${Math.round(this.satisfaction)}%</strong>
+                            <div class="score-bar-mini"><div class="score-bar-mini-fill" style="width:${this.satisfaction}%;background:${scoreBarColor(this.satisfaction)}"></div></div>
+                        </div>
+                    </div>
+                    <div class="final-score-item">
+                        <span>Versorgungsqualität</span>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <strong>${Math.round(this.quality)}%</strong>
+                            <div class="score-bar-mini"><div class="score-bar-mini-fill" style="width:${this.quality}%;background:${scoreBarColor(this.quality)}"></div></div>
+                        </div>
+                    </div>
+                    <div class="final-score-item">
+                        <span>Gerechtigkeit</span>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <strong>${Math.round(this.justice)}%</strong>
+                            <div class="score-bar-mini"><div class="score-bar-mini-fill" style="width:${this.justice}%;background:${scoreBarColor(this.justice)}"></div></div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px;font-size:0.9em;">
+                    <div class="info-box" style="margin:0;">
+                        <strong>Stakeholder-Details:</strong><br>
+                        AOK: ${Math.round(this.stakeholders.aok)}%<br>
+                        Ärzte: ${Math.round(this.stakeholders.doctors)}%<br>
+                        Grüne: ${Math.round(this.stakeholders.greens)}%<br>
+                        Patienten: ${Math.round(this.stakeholders.patients)}%<br>
+                        Arbeitgeber: ${Math.round(this.stakeholders.employers)}%
+                    </div>
+                    <div class="info-box" style="margin:0;">
+                        <strong>Statistiken:</strong><br>
+                        Entscheidungen: ${this.decisions.length}<br>
+                        Reformen: ${this.policiesEnacted.length}<br>
+                        Tage genutzt: ${Math.min(this.day, 90)} von 90
+                    </div>
+                </div>
+                ${decisionsHTML}
+                <button class="restart-btn" onclick="location.reload()">Nochmal spielen</button>
+            `;
+
+            document.getElementById('gameOverOverlay').classList.add('active');
+
+            // Also update the main dialog
+            this.setDialog(
+                'Spiel beendet!',
+                `<p style="text-align:center;font-size:1.1em;">Die 90 Tage sind vorbei. Die Haushalts-Debatte hat begonnen!</p>
+                <p style="text-align:center;margin-top:10px;">Deine Gesamtnote: <strong>${grade}</strong> (${score}/100 Punkte)</p>`,
+                `<button class="option-btn" onclick="location.reload()"><strong>Nochmal spielen</strong></button>`
+            );
+        }
+    };
+
+    // Initialize game on load
+    window.addEventListener('DOMContentLoaded', () => {
+        game.init();
+    });
+    </script>
+</body>
+</html>
